@@ -13,7 +13,7 @@ export const PostItem = memo(({ data }) => {
   )
 
   return (
-    <div className="reddit-post">
+    <li className="reddit-posts__item reddit-post">
       <div className="reddit-post__image">
         <img
           src={
@@ -34,6 +34,6 @@ export const PostItem = memo(({ data }) => {
           Link
         </a>
       </div>
-    </div>
+    </li>
   )
 })

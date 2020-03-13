@@ -58,17 +58,13 @@ export default class PostsList extends React.Component {
     const { minComments } = this.props
     const filteredPosts = this.getPostsByComments(posts, minComments)
     return (
-      <div>
+      <div className="reddit-gallery__posts">
         {isLoading ? (
           <p className="loading-message">Loading posts...</p>
         ) : filteredPosts.length > 0 ? (
           <ul className="reddit-posts">
             {filteredPosts.map(post => {
-              return (
-                <li key={post.data.id} className="reddit-posts__item">
-                  <PostItem data={post.data} />
-                </li>
-              )
+              return <PostItem data={post.data} key={post.data.id} />
             })}
           </ul>
         ) : (
