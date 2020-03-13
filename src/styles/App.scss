@@ -12,14 +12,26 @@
 }
 
 .reddit-gallery__range-filter {
-  > input {
-    width: 600px;
-  }
   > p {
     color: #ef642a;
     font-size: 22px;
+    font-weight: bolder;
   }
   margin-bottom: 32px;
+}
+
+.reddit-gallery__range-filter-container {
+  display: flex;
+  > input {
+    flex-grow: 1;
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+  > span {
+    color: #ef642a;
+    font-size: 18px;
+    font-weight: bolder;
+  }
 }
 
 .reddit-gallery__refresh-button {
@@ -29,8 +41,8 @@
     background-color: green;
     font-size: 20px;
     font-weight: bolder;
-    border-radius: 5px;
-    padding: 5px 10px;
+    border-radius: 8px;
+    padding: 15px;
     color: #fff
   
   }

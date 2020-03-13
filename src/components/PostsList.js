@@ -1,5 +1,5 @@
 import React from 'react'
-import PostItem from './PostItem'
+import { PostItem } from './PostItem'
 
 export default class PostsList extends React.Component {
   constructor() {
@@ -7,8 +7,7 @@ export default class PostsList extends React.Component {
 
     this.state = {
       posts: [],
-      filteredPosts: [],
-      loading: true,
+      isLoading: false,
     }
   }
 
@@ -16,93 +15,67 @@ export default class PostsList extends React.Component {
     link: 'https://www.reddit.com/r/reactjs.json?limit=100',
   }
 
-  filterPosts = () => {
-    const { posts } = this.state
-    const { commentFilter } = this.props
-    const filteredPosts = posts.filter(
-      post => post.data.num_comments >= commentFilter
-    )
-    this.setState({
-      filteredPosts,
-    })
+  componentDidMount() {
+    this.getPosts()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.enableAutoRefresh !== this.props.enableAutoRefresh) {
+      this.updateAutoRefresh()
+    }
   }
 
   getPosts = () => {
     const { link } = this.props
     this.setState({
-      loading: true,
+      isLoading: true,
     })
     fetch(link)
       .then(response => response.json())
-      .then(data => {
-        const posts = data.data.children.sort((a, b) => {
-          return b.data.num_comments - a.data.num_comments
-        })
+      .then(({ data }) => {
         this.setState({
-          posts,
-          loading: false,
+          posts: data.children,
+          isLoading: false,
         })
-        this.filterPosts()
       })
   }
 
-  componentDidMount() {
-    this.getPosts()
-    this.filterPosts()
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.commentFilter !== this.props.commentFilter) {
-      this.filterPosts()
-    }
-    if (
-      this.props.refreshing &&
-      prevProps.refreshing !== this.props.refreshing
-    ) {
-      this.startRefreshPosts()
-      // console.log('start')
-    }
-    if (
-      !this.props.refreshing &&
-      prevProps.refreshing !== this.props.refreshing
-    ) {
-      this.stopRefreshPosts()
-      // console.log('stop')
+  updateAutoRefresh = () => {
+    if (this.props.enableAutoRefresh) {
+      this.autoRefresh = setInterval(this.getPosts, 3000)
+    } else {
+      clearInterval(this.autoRefresh)
     }
   }
 
-  startRefreshPosts = () => {
-    this.updateTimer = setInterval(() => {
-      this.getPosts()
-    }, 3000)
-  }
-
-  stopRefreshPosts = () => {
-    clearInterval(this.updateTimer)
-  }
+  getPostsByComments = (posts, minComments) =>
+    posts
+      .filter(post => post.data.num_comments >= minComments)
+      .sort((a, b) => b.data.num_comments - a.data.num_comments)
 
   render() {
-    const { filteredPosts, loading } = this.state
+    const { posts, isLoading } = this.state
+    const { minComments } = this.props
+    const filteredPosts = this.getPostsByComments(posts, minComments)
     return (
       <div>
-        {loading ? (
-          <div className="loading-message">Loading posts...</div>
-        ) : (
+        {isLoading ? (
+          <p className="loading-message">Loading posts...</p>
+        ) : filteredPosts.length > 0 ? (
           <ul className="reddit-posts">
             {filteredPosts.map(post => {
               return (
                 <li key={post.data.id} className="reddit-posts__item">
-                  <PostItem item={post} />
+                  <PostItem data={post.data} />
                 </li>
               )
             })}
           </ul>
-        )}
-        {filteredPosts.length === 0 ? (
+        ) : (
           <div className="reddit-gallery__empty-posts-message">
             No results found matching your criteria
           </div>
-        ) : null}
+        )}
       </div>
     )
   }
