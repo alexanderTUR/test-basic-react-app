@@ -21,7 +21,7 @@ export default class PostsList extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.enableAutoRefresh !== this.props.enableAutoRefresh) {
-      this.updateAutoRefresh()
+      this.updateAutoRefresh(this.props.enableAutoRefresh)
     }
   }
 
@@ -40,8 +40,8 @@ export default class PostsList extends React.Component {
       })
   }
 
-  updateAutoRefresh = () => {
-    if (this.props.enableAutoRefresh) {
+  updateAutoRefresh = enableAutoRefresh => {
+    if (enableAutoRefresh) {
       this.autoRefresh = setInterval(this.getPosts, 3000)
     } else {
       clearInterval(this.autoRefresh)
